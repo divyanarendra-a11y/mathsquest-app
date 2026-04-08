@@ -1,3 +1,17 @@
+# Node / JS
+node_modules/
+dist/
+build/
+.env.local
+*.log
+.DS_Store
+.expo/
+ios/
+android/
+*.tsbuildinfo
+.turbo/
+coverage/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
