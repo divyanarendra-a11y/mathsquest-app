@@ -3,6 +3,8 @@ import { useStore } from './store/useStore';
 import { WorldMap } from './pages/WorldMap';
 import { WorldDetail } from './pages/WorldDetail';
 import { PrimeSmash } from './pages/PrimeSmash';
+import { RobotFactory } from './pages/RobotFactory';
+import { RecipeRescaler } from './pages/RecipeRescaler';
 import { Login } from './pages/Login';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -37,6 +39,22 @@ export function App() {
           element={
             <RequireAuth>
               <PrimeSmash />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/puzzles/robot-factory"
+          element={
+            <RequireAuth>
+              <RobotFactory />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/puzzles/recipe-rescaler"
+          element={
+            <RequireAuth>
+              <RecipeRescaler />
             </RequireAuth>
           }
         />
