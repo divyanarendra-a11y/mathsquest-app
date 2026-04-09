@@ -1,0 +1,25 @@
+{
+  "name": "mathsquest-app",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "yarn workspace @mathsquest/api dev",
+    "dev:web": "yarn workspace @mathsquest/web dev",
+    "dev:app": "yarn workspace @mathsquest/app start",
+    "dev:teacher": "yarn workspace @mathsquest/teacher dev",
+    "build:web": "yarn workspace @mathsquest/web build",
+    "build:teacher": "yarn workspace @mathsquest/teacher build",
+    "db:generate": "yarn workspace @mathsquest/api db:generate",
+    "db:migrate": "yarn workspace @mathsquest/api db:migrate",
+    "db:studio": "yarn workspace @mathsquest/api db:studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

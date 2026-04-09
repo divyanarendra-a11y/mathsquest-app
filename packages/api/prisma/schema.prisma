@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  googleId      String?  @unique
+  passwordHash  String?
+  classId       String?
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  streakDays    Int      @default(0)
+  lastLoginDate DateTime?
+  avatarId      String   @default("avatar_1")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  class          Class?          @relation(fields: [classId], references: [id])
+  worldProgress  WorldProgress[]
+  puzzleAttempts PuzzleAttempt[]
+  hintToken      HintToken?
+  challengesAsChallenger Challenge[] @relation("challenger")
+  challengesAsOpponent   Challenge[] @relation("opponent")
+
+  @@index([classId])
+}
+
+model Class {
+  id                 String   @id @default(cuid())
+  teacherId          String
+  name               String
+  leaderboardEnabled Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  teacher    Teacher   @relation(fields: [teacherId], references: [id])
+  students   User[]
+  challenges Challenge[]
+}
+
+model Teacher {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  googleId     String?  @unique
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  classes Class[]
+}
+
+model World {
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  name           String
+  description    String
+  curriculumUnit String
+  orderIndex     Int     @unique
+  color          String
+  iconEmoji      String
+
+  puzzles       Puzzle[]
+  worldProgress WorldProgress[]
+}
+
+model Puzzle {
+  id          String  @id @default(cuid())
+  worldId     String
+  slug        String  @unique
+  name        String
+  description String
+  type        String
+  maxStars    Int     @default(3)
+  orderIndex  Int
+
+  world          World           @relation(fields: [worldId], references: [id])
+  puzzleAttempts PuzzleAttempt[]
+
+  @@index([worldId])
+}
+
+model WorldProgress {
+  id               String   @id @default(cuid())
+  userId           String
+  worldId          String
+  starsEarned      Int      @default(0)
+  percentComplete  Float    @default(0)
+  puzzlesAttempted Int      @default(0)
+  updatedAt        DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  world World @relation(fields: [worldId], references: [id])
+
+  @@unique([userId, worldId])
+  @@index([userId])
+}
+
+model PuzzleAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  puzzleId    String
+  score       Int
+  timeTaken   Int
+  hintsUsed   Int      @default(0)
+  starsEarned Int      @default(0)
+  completedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id])
+
+  @@index([userId])
+  @@index([puzzleId])
+}
+
+model HintToken {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  balance    Int      @default(3)
+  lastEarned DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Challenge {
+  id           String          @id @default(cuid())
+  classId      String
+  challengerId String
+  opponentId   String
+  puzzleId     String
+  status       ChallengeStatus @default(PENDING)
+  challengerScore Int?
+  opponentScore   Int?
+  createdAt    DateTime        @default(now())
+  completedAt  DateTime?
+
+  class      Class @relation(fields: [classId], references: [id])
+  challenger User  @relation("challenger", fields: [challengerId], references: [id])
+  opponent   User  @relation("opponent", fields: [opponentId], references: [id])
+
+  @@index([classId])
+  @@index([challengerId])
+  @@index([opponentId])
+}
+
+enum ChallengeStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
