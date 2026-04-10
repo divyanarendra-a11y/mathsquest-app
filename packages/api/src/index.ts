@@ -13,7 +13,7 @@ const PORT = process.env.API_PORT ?? 3001;
 
 // Middleware
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:5173', 'http://localhost:5174'],
+  origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['https://idyllic-caramel-c36fd4.netlify.app', 'http://localhost:5173'],
   credentials: true,
 }));
 app.use(express.json());
