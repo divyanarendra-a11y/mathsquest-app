@@ -1,7 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
+import { PrismaClient } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
+
+type TxClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
 import { calculateStars, calculatePuzzleXp, calculateLevel, WORLD_UNLOCK_THRESHOLD } from '../lib/xp.js';
 import { addXpToLeaderboard } from '../lib/redis.js';
 
@@ -58,7 +61,7 @@ router.post('/:id/attempt', requireAuth, async (req: Request, res: Response): Pr
     score, maxScore, starsEarned, isFirstThreeStar, user.streakDays,
   );
 
-  const result = await prisma.$transaction(async (tx: typeof prisma) => {
+  const result = await prisma.$transaction(async (tx: TxClient) => {
     // Record the attempt
     const attempt = await tx.puzzleAttempt.create({
       data: { userId, puzzleId: puzzle.id, score, timeTaken, hintsUsed, starsEarned },

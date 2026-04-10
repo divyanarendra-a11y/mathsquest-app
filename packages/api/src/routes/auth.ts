@@ -1,9 +1,12 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { PrismaClient } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { signToken } from '../middleware/auth.js';
 import { updateStreak } from '../lib/xp.js';
+
+type TxClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
 
 const router = Router();
 
@@ -41,7 +44,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     // Handle daily login streak + XP
     const { newStreakDays, xpBonus, hintBonus } = updateStreak(user.lastLoginDate);
     if (newStreakDays > 0) {
-      await prisma.$transaction(async (tx: typeof prisma) => {
+      await prisma.$transaction(async (tx: TxClient) => {
         await tx.user.update({
           where: { id: user.id },
           data: {

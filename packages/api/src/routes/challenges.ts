@@ -94,7 +94,8 @@ router.put('/:id/complete', requireAuth, async (req: Request, res: Response): Pr
       }
     }
 
-    return res.json({ status: 'COMPLETED', winnerId });
+    res.json({ status: 'COMPLETED', winnerId });
+    return;
   }
 
   res.json({ status: 'IN_PROGRESS', waiting: isChallenger ? 'opponent' : 'challenger' });
