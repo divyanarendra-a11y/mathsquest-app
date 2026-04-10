@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { puzzlesApi } from '../lib/api';
 
@@ -107,7 +107,7 @@ export function RecipeRescaler() {
   const [unlockedSteps, setUnlockedSteps] = useState(0);
   const [reverting, setReverting] = useState(false);
   const [score, setScore] = useState(0);
-  const [wrongCount, setWrongCount] = useState(0);
+  const [_wrongCount, setWrongCount] = useState(0);
   const [result, setResult] = useState<{ xpGained: number; starsEarned: number } | null>(null);
   const startTimeRef = useRef(Date.now());
 
@@ -356,12 +356,12 @@ export function RecipeRescaler() {
                             : 'focus:ring-mq-purple'
                         }`}
                         placeholder={`? ${ing.unit}`}
-                        disabled={state === 'correct'}
+                        disabled={state !== null}
                       />
                       <button
                         className="p-2 bg-mq-purple hover:bg-purple-600 rounded-lg transition-colors text-white text-sm"
                         onClick={() => handleCheck(i)}
-                        disabled={state === 'correct'}
+                        disabled={state !== null}
                       >
                         ✓
                       </button>

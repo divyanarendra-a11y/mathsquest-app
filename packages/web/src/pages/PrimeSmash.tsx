@@ -44,7 +44,6 @@ class PrimeSmasherScene extends Phaser.Scene {
   private level = 1;
   private spawnTimer!: Phaser.Time.TimerEvent;
   private callbacks!: GameCallbacks;
-  private startTime = 0;
   private numbersCorrect = 0;
   private totalPrimesTapped = 0;
   private spawnCount = 0;
@@ -68,8 +67,6 @@ class PrimeSmasherScene extends Phaser.Scene {
   }
 
   create() {
-    this.startTime = Date.now();
-
     // Background gradient via rectangle
     const bg = this.add.graphics();
     bg.fillGradientStyle(0x0f0c29, 0x0f0c29, 0x302b63, 0x24243e, 1);
@@ -83,8 +80,7 @@ class PrimeSmasherScene extends Phaser.Scene {
       fontSize: '13px',
       color: '#ff4444',
       fontFamily: 'Nunito',
-      alpha: 0.6,
-    }).setOrigin(0.5, 0);
+    }).setOrigin(0.5, 0).setAlpha(0.6);
 
     this.scheduleSpawn();
 
@@ -160,7 +156,7 @@ class PrimeSmasherScene extends Phaser.Scene {
     this.fallingNumbers.push(container);
   }
 
-  private handleTap(container: Phaser.GameObjects.Container, value: number, prime: boolean) {
+  private handleTap(container: Phaser.GameObjects.Container, _value: number, prime: boolean) {
     container.removeInteractive();
 
     if (prime) {
@@ -235,7 +231,6 @@ class PrimeSmasherScene extends Phaser.Scene {
     this.spawnTimer.remove();
     this.fallingNumbers.forEach((n) => n.destroy());
     this.fallingNumbers = [];
-    const elapsed = Math.round((Date.now() - this.startTime) / 1000);
     this.callbacks.onGameOver(this.score);
   }
 
@@ -280,7 +275,7 @@ interface GameState {
 
 export function PrimeSmash() {
   const navigate = useNavigate();
-  const { userId, updateWorldProgress, addXp } = useStore();
+  const { userId, updateWorldProgress: _updateWorldProgress, addXp } = useStore();
   const gameRef = useRef<Phaser.Game | null>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const startTimeRef = useRef<number>(0);
