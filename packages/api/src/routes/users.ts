@@ -1,15 +1,30 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import type { World, Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
 import { calculateLevel, WORLD_UNLOCK_THRESHOLD } from '../lib/xp.js';
 
 const router = Router();
 
-type WorldProgressWithWorld = Prisma.WorldProgressGetPayload<{
-  include: { world: { select: { id: true; slug: true; name: true; orderIndex: true } } };
-}>;
+// Inline shapes — avoids dependency on Prisma-generated types at build time
+interface WorldRow {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  curriculumUnit: string;
+  orderIndex: number;
+  color: string;
+  iconEmoji: string;
+}
+
+interface WorldProgressRow {
+  worldId: string;
+  starsEarned: number;
+  percentComplete: number;
+  puzzlesAttempted: number;
+  world: { id: string; slug: string; name: string; orderIndex: number };
+}
 
 // GET /users/:id/progress
 router.get('/:id/progress', requireAuth, async (req: Request, res: Response): Promise<void> => {
@@ -38,11 +53,11 @@ router.get('/:id/progress', requireAuth, async (req: Request, res: Response): Pr
 
   // Determine which worlds are unlocked
   const worlds = await prisma.world.findMany({ orderBy: { orderIndex: 'asc' } });
-  const progressMap = Object.fromEntries(worldProgress.map((wp: WorldProgressWithWorld) => [wp.worldId, wp]));
+  const progressMap = Object.fromEntries((worldProgress as WorldProgressRow[]).map((wp) => [wp.worldId, wp]));
 
-  const worldsWithUnlock = worlds.map((world: World) => {
+  const worldsWithUnlock = (worlds as WorldRow[]).map((world) => {
     const progress = progressMap[world.id];
-    const prevWorld = worlds.find((w: World) => w.orderIndex === world.orderIndex - 1);
+    const prevWorld = (worlds as WorldRow[]).find((w) => w.orderIndex === world.orderIndex - 1);
 
     let unlocked = world.orderIndex === 1;
     if (prevWorld) {

@@ -58,7 +58,7 @@ router.post('/:id/attempt', requireAuth, async (req: Request, res: Response): Pr
     score, maxScore, starsEarned, isFirstThreeStar, user.streakDays,
   );
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: typeof prisma) => {
     // Record the attempt
     const attempt = await tx.puzzleAttempt.create({
       data: { userId, puzzleId: puzzle.id, score, timeTaken, hintsUsed, starsEarned },

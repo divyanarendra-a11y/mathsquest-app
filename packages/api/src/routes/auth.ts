@@ -41,7 +41,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     // Handle daily login streak + XP
     const { newStreakDays, xpBonus, hintBonus } = updateStreak(user.lastLoginDate);
     if (newStreakDays > 0) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: typeof prisma) => {
         await tx.user.update({
           where: { id: user.id },
           data: {

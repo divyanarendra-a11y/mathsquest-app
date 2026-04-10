@@ -9,13 +9,13 @@ export function getRedis(): Redis {
     redis = new Redis(REDIS_URL, {
       lazyConnect: true,
       enableOfflineQueue: false,
-      retryStrategy: (times) => {
+      retryStrategy: (times: number) => {
         if (times > 3) return null; // stop retrying
         return Math.min(times * 100, 3000);
       },
     });
 
-    redis.on('error', (err) => {
+    redis.on('error', (err: Error) => {
       // Log but don't crash — leaderboard degrades gracefully
       console.warn('[Redis] connection error:', err.message);
     });

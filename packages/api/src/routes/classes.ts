@@ -29,7 +29,8 @@ router.get('/:id/leaderboard', requireAuth, async (req: Request, res: Response):
     select: { id: true, name: true, avatarId: true, level: true },
   });
 
-  const userMap = Object.fromEntries(users.map((u) => [u.id, u]));
+  interface UserRow { id: string; name: string; avatarId: string; level: number }
+  const userMap = Object.fromEntries((users as UserRow[]).map((u) => [u.id, u]));
 
   const leaderboard = entries
     .map((entry, index) => ({
