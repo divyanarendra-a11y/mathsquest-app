@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    host: true,
+    allowedHosts: ['all'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
@@ -16,6 +17,7 @@ export default defineConfig({
   preview: {
     port: 4173,
     host: true,
+    allowedHosts: ['all'],
   },
   build: {
     outDir: 'dist',
